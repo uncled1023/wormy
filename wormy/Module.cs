@@ -5,15 +5,18 @@ using NHibernate.Linq;
 using ChatSharp.Events;
 using wormy.Database;
 using wormy.Modules;
+using System.Text.RegularExpressions;
 
 namespace wormy
 {
     public abstract class Module
     {
         public delegate void CommandHandler(string[] arguments, PrivateMessageEventArgs e);
+        public delegate void RegexHandler(PrivateMessageEventArgs e, MatchCollection matches);
 
         internal Dictionary<string, CommandHandler> AdminCommandHandlers;
         internal Dictionary<string, CommandHandler> UserCommandHandlers;
+        internal Dictionary<Regex, RegexHandler> RegexHandlers;
 
         protected NetworkManager NetworkManager { get; set; }
 
@@ -25,6 +28,7 @@ namespace wormy
             NetworkManager = network;
             AdminCommandHandlers = new Dictionary<string, CommandHandler>();
             UserCommandHandlers = new Dictionary<string, CommandHandler>();
+            RegexHandlers = new Dictionary<Regex, RegexHandler>();
         }
 
         protected void RegisterUserCommand(string command, CommandHandler handler, string help = null)
@@ -49,6 +53,11 @@ namespace wormy
             }
         }
 
+        protected void MatchRegex(string regex, RegexHandler handler, RegexOptions options = RegexOptions.None)
+        {
+            RegexHandlers.Add(new Regex(regex, RegexOptions.Compiled | options), handler);
+        }
+
         protected void Respond(PrivateMessageEventArgs e, string format, params object[] arguments)
         {
             NetworkManager.Client.SendMessage(string.Format(format, arguments), e.PrivateMessage.Source);
@@ -66,6 +75,14 @@ namespace wormy
 
         internal bool HandleUserMessage(PrivateMessageEventArgs e)
         {
+            foreach (var handler in RegexHandlers)
+            {
+                var matches = handler.Key.Matches(e.PrivateMessage.Message);
+                if (matches.Count != 0)
+                {
+                    handler.Value(e, matches);
+                }
+            }
             return HandleMessage(UserCommandHandlers, e);
         }
 
