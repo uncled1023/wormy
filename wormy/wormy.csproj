@@ -79,6 +79,8 @@
     <Compile Include="Modules\GoogleModule.cs" />
     <Compile Include="Modules\YouTubeModule.cs" />
     <Compile Include="Modules\MiscSearchesModule.cs" />
+    <Compile Include="Modules\MoeModule.cs" />
+    <Compile Include="Modules\RedditModule.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

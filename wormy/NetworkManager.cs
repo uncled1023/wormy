@@ -28,19 +28,25 @@ namespace wormy
 
         void RegisterModules()
         {
-            // Help module has to be loaded first
-            // TODO: Better dependency resolution, probably via attributes on the class
+            // Help module has to be loaded first (TODO: Remove special case in favor of dependencies)
             var help = new HelpModule(this);
             Modules.Add(help);
+
+            var moduleTypes = new List<Type>();
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 foreach (var type in assembly.GetTypes().Where(t =>
                     typeof(Module).IsAssignableFrom(t) && !t.IsAbstract && t != typeof(HelpModule)))
                 {
-                    var module = (Module)Activator.CreateInstance(type, this);
-                    Modules.Add(module);
+                    moduleTypes.Add(type);
                 }
             }
+            // TODO: Sort modules by dependencies here
+            moduleTypes.ToList().ForEach(t =>
+                {
+                    var module = (Module)Activator.CreateInstance(t, this);
+                    Modules.Add(module);
+                });
             ModulesLoaded(this, null);
         }
 

@@ -8,6 +8,7 @@ using System.Linq;
 
 namespace wormy.Modules
 {
+    [Depends(typeof(LinksModule))]
     public class MediaCrushModule : Module
     {
         public override string Name { get { return "mediacrush"; } }

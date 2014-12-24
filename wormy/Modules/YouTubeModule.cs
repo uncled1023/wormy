@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 namespace wormy.Modules
 {
     // TODO: Add some stuff to ChatSharp to make formatting colored messages less painful
+    [Depends(typeof(GoogleModule))]
+    [Depends(typeof(LinksModule))]
     public class YouTubeModule : Module
     {
         public override string Name { get { return "youtube"; } }

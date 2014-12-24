@@ -6,6 +6,7 @@ namespace wormy.Database
     public class MoePost
     {
         public virtual int Id { get; set; }
+        public virtual WormyChannel Channel { get; set; }
         public virtual string RedditId { get; set; }
         public virtual string SearchTerms { get; set; }
 
@@ -16,6 +17,7 @@ namespace wormy.Database
                 Id(m => m.Id);
                 Map(m => m.RedditId);
                 Map(m => m.SearchTerms).Nullable();
+                References<WormyChannel>(m => m.Channel).Nullable();
             }
         }
     }

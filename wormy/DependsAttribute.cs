@@ -2,6 +2,7 @@
 
 namespace wormy
 {
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class DependsAttribute : Attribute
     {
         public Type DependsOn { get; set; }

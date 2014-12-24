@@ -4,6 +4,7 @@ using ChatSharp.Events;
 
 namespace wormy.Modules
 {
+    [Depends(typeof(GoogleModule))]
     public class MiscSearchesModule : Module
     {
         public override string Name { get { return "searches"; } }

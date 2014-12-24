@@ -3,6 +3,8 @@ using System.IO;
 using wormy.Database;
 using System.Collections.Generic;
 using System.Threading;
+using RedditSharp;
+using System.Threading.Tasks;
 
 namespace wormy
 {
