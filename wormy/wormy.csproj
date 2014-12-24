@@ -57,6 +57,8 @@
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -75,6 +77,7 @@
     <Compile Include="DependsAttribute.cs" />
     <Compile Include="Modules\MediaCrushModule.cs" />
     <Compile Include="Modules\GoogleModule.cs" />
+    <Compile Include="Modules\YouTubeModule.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
