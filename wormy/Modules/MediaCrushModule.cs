@@ -15,10 +15,7 @@ namespace wormy.Modules
 
         public MediaCrushModule(NetworkManager network) : base(network)
         {
-            network.ModulesLoaded += (sender, e) =>
-            {
-                GetModule<LinksModule>().RegisterHostHandler("mediacru.sh", HandleUri);
-            };
+            network.ModulesLoaded += (sender, e) => GetModule<LinksModule>().RegisterHostHandler("mediacru.sh", HandleUri);
         }
 
         private void HandleUri(Uri uri, PrivateMessageEventArgs e)

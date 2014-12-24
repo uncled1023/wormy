@@ -74,6 +74,7 @@
     <Compile Include="Modules\HelpModule.cs" />
     <Compile Include="DependsAttribute.cs" />
     <Compile Include="Modules\MediaCrushModule.cs" />
+    <Compile Include="Modules\GoogleModule.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

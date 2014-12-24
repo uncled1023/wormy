@@ -19,6 +19,7 @@ namespace wormy.Modules
             // We have to register our own commands _after_ our module is loaded, so that we can manage our own help text
             network.ModulesLoaded += (sender, _) =>
             {
+                RegisterUserCommand("source", (arguments, e) => RespondTo(e, "https://github.com/SirCmpwn/wormy"));
                 RegisterUserCommand("commands", (arguments, e) =>
                     {
                         var commands = network.Modules.SelectMany(mod => mod.UserCommandHandlers.Keys);

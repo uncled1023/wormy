@@ -51,6 +51,8 @@ namespace wormy
             public string Password { get; set; }
             [JsonProperty("realname")]
             public string RealName { get; set; }
+            [JsonProperty("messageNickServ")]
+            public bool MessageNickServ { get; set; }
         }
 
         public class RedditConfiguration
