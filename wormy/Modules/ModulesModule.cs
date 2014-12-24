@@ -12,7 +12,7 @@ namespace wormy.Modules
         {
             // TODO: Only show modules available in the current channel?
             RegisterAdminCommand("modules", (arguments, e) =>
-                Respond(e, "Installed modules: {0}", string.Join(", ", network.Modules.Select(m => m.Name))),
+                Respond(e, "Installed modules: {0}", string.Join(", ", network.Modules.Select(m => m.Name).OrderBy(m => m))),
                 "modules: Lists installed modules");
             RegisterAdminCommand("modinfo", (arguments, e) =>
                 {

@@ -1,15 +1,17 @@
 ﻿using System;
 using FluentNHibernate.Mapping;
+using System.Collections.Generic;
 
 namespace wormy.Database
 {
     public class WormyChannel
     {
-        public virtual int Id { get; set; }
+        public virtual int Id { get; protected set; }
         public virtual string Network { get; set; }
         public virtual string Name { get; set; }
         public virtual string Key { get; set; }
         public virtual string CommandPrefix { get; set; }
+        public virtual IList<ChannelUser> Users { get; protected set; }
 
         public class Mapping : ClassMap<WormyChannel>
         {
@@ -20,6 +22,9 @@ namespace wormy.Database
                 Map(m => m.Key);
                 Map(m => m.Network);
                 Map(m => m.CommandPrefix);
+                HasManyToMany(m => m.Users)
+                    .Inverse()
+                    .Table("UserChannel");
             }
         }
     }

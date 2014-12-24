@@ -19,6 +19,7 @@ namespace wormy.Database
             SessionFactory = Fluently.Configure()
                 .Database(config)
                 .Mappings(m => m.FluentMappings.Add<MoePost.Mapping>())
+                .Mappings(m => m.FluentMappings.Add<ChannelUser.Mapping>())
                 .Mappings(m => m.FluentMappings.Add<WormyChannel.Mapping>())
                 .ExposeConfiguration(BuildSchema)
                 .BuildSessionFactory();

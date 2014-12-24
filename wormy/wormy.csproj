@@ -81,6 +81,8 @@
     <Compile Include="Modules\MiscSearchesModule.cs" />
     <Compile Include="Modules\MoeModule.cs" />
     <Compile Include="Modules\RedditModule.cs" />
+    <Compile Include="Database\ChannelUser.cs" />
+    <Compile Include="Modules\TrackingModule.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
