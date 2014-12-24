@@ -12,7 +12,7 @@ namespace wormy.Modules
 
         public PongModule(NetworkManager network) : base(network)
         {
-            RegisterUserCommand("ping", (arguments, e) => Respond(e, "pong!"));
+            RegisterUserCommand("ping", (arguments, e) => RespondTo(e, "pong!"));
         }
     }
 }

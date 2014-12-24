@@ -5,6 +5,7 @@ using System.Net;
 using System.IO;
 using HtmlAgilityPack;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace wormy.Modules
 {
@@ -17,7 +18,7 @@ namespace wormy.Modules
 
         public LinksModule(NetworkManager network) : base(network)
         {
-            MatchRegex(UrlRegex, (e, matches) =>
+            MatchRegex(UrlRegex, (e, matches) => Task.Factory.StartNew(() =>
                 {
                     foreach (Match match in matches)
                     {
@@ -34,7 +35,7 @@ namespace wormy.Modules
                             }
                         }
                     }
-                });
+                }));
         }
 
         public static string FetchPageTitle(string url)

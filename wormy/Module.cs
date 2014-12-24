@@ -58,6 +58,11 @@ namespace wormy
             RegexHandlers.Add(new Regex(regex, RegexOptions.Compiled | options), handler);
         }
 
+        protected void RespondTo(PrivateMessageEventArgs e, string format, params object[] arguments)
+        {
+            NetworkManager.Client.SendMessage(e.PrivateMessage.User.Nick + ": " + string.Format(format, arguments), e.PrivateMessage.Source);
+        }
+
         protected void Respond(PrivateMessageEventArgs e, string format, params object[] arguments)
         {
             NetworkManager.Client.SendMessage(string.Format(format, arguments), e.PrivateMessage.Source);
@@ -117,7 +122,8 @@ namespace wormy
                     }
                     catch (Exception ex)
                     {
-                        // TODO: Log this exception
+                        // TODO: Log this exception better
+                        Console.WriteLine(ex);
                         return false;
                     }
                 }

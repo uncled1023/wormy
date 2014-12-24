@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using ChatSharp.Events;
 
 namespace wormy.Modules
 {
@@ -28,15 +29,26 @@ namespace wormy.Modules
                         Respond(e, "Available commands: {0}", string.Join(", ", list));
                         Respond(e, "You may use .help [command] for information on specific commands.");
                     }, "commands: lists available commands");
-                RegisterUserCommand("help", (arguments, e) =>
+                RegisterUserCommand("help", HandleHelp, "help [topic]: Gives documentation for [topic]");
+                RegisterUserCommand("h", HandleHelp);
+                RegisterUserCommand("aliases", (arguments, e) =>
                     {
-                        if (arguments.Length != 1) return;
-                        if (HelpText.ContainsKey(arguments[0]))
-                            Respond(e, HelpText[arguments[0]]);
-                        else
-                            Respond(e, "No help available for '{0}'", arguments[0]);
-                    }, "help [topic]: Gives documentation for [topic]");
+                        var commands = network.Modules.SelectMany(mod => mod.UserCommandHandlers)
+                            .Concat(network.Modules.SelectMany(mod => mod.AdminCommandHandlers));
+                        var c = commands.Single(__ => __.Key == arguments[0]);
+                        var aliases = commands.Where(__ => __.Value == c.Value).Select(a => a.Key);
+                        Respond(e, "Aliases for {0}: {1}", arguments[0], string.Join(", ", aliases));
+                    }, "aliases [command]: Lists commands that are aliased to the specified command.");
             };
+        }
+
+        private void HandleHelp(string[] arguments, PrivateMessageEventArgs e)
+        {
+            if (arguments.Length != 1) return;
+            if (HelpText.ContainsKey(arguments[0]))
+                Respond(e, HelpText[arguments[0]]);
+            else
+                Respond(e, "No help available for '{0}'", arguments[0]);
         }
 
         public void AddHelp(string command, string text)
