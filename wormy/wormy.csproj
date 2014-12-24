@@ -67,6 +67,10 @@
     <Compile Include="NetworkManager.cs" />
     <Compile Include="Modules\ChannelModule.cs" />
     <Compile Include="Module.cs" />
+    <Compile Include="Modules\PongModule.cs" />
+    <Compile Include="Modules\ModulesModule.cs" />
+    <Compile Include="Modules\LinksModule.cs" />
+    <Compile Include="Modules\HelpModule.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

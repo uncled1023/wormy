@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
+using NHibernate.Linq;
 using ChatSharp.Events;
+using wormy.Database;
+using wormy.Modules;
 
 namespace wormy
 {
@@ -8,8 +12,8 @@ namespace wormy
     {
         public delegate void CommandHandler(string[] arguments, PrivateMessageEventArgs e);
 
-        private Dictionary<string, CommandHandler> AdminCommandHandlers;
-        private Dictionary<string, CommandHandler> UserCommandHandlers;
+        internal Dictionary<string, CommandHandler> AdminCommandHandlers;
+        internal Dictionary<string, CommandHandler> UserCommandHandlers;
 
         protected NetworkManager NetworkManager { get; set; }
 
@@ -23,19 +27,36 @@ namespace wormy
             UserCommandHandlers = new Dictionary<string, CommandHandler>();
         }
 
-        protected void RegisterUserCommand(string command, CommandHandler handler)
+        protected void RegisterUserCommand(string command, CommandHandler handler, string help = null)
         {
             UserCommandHandlers.Add(command, handler);
+            if (help != null)
+            {
+                var mod = NetworkManager.Modules.SingleOrDefault(m => m.GetType() == typeof(HelpModule)) as HelpModule;
+                if (mod != null)
+                    mod.AddHelp(command, help);
+            }
         }
 
-        protected void RegisterAdminCommand(string command, CommandHandler handler)
+        protected void RegisterAdminCommand(string command, CommandHandler handler, string help = null)
         {
             AdminCommandHandlers.Add(command, handler);
+            if (help != null)
+            {
+                var mod = NetworkManager.Modules.SingleOrDefault(m => m.GetType() == typeof(HelpModule)) as HelpModule;
+                if (mod != null)
+                    mod.AddHelp(command, help);
+            }
         }
 
         protected void Respond(PrivateMessageEventArgs e, string format, params object[] arguments)
         {
             NetworkManager.Client.SendMessage(string.Format(format, arguments), e.PrivateMessage.Source);
+        }
+
+        protected bool IsAdmin(PrivateMessageEventArgs e)
+        {
+            return Program.Configuration.AdminMasks.Any(e.PrivateMessage.User.Match);
         }
 
         internal bool HandleAdminMessage(PrivateMessageEventArgs e)
@@ -53,7 +74,12 @@ namespace wormy
             string prefix = null;
             if (e.PrivateMessage.IsChannelMessage)
             {
-                // TODO: Look up channel and corresponding command prefix
+                using (var session = Program.Database.SessionFactory.OpenSession())
+                {
+                    var channel = session.Query<WormyChannel>().SingleOrDefault(cw => cw.Name == e.PrivateMessage.Source);
+                    if (channel != null)
+                        prefix = channel.CommandPrefix;
+                }
             }
             else
                 prefix = ""; // User messages require no prefix
@@ -62,13 +88,21 @@ namespace wormy
             {
                 var space = e.PrivateMessage.Message.IndexOf(' ');
                 if (space == -1)
-                    space = e.PrivateMessage.Message.Length - prefix.Length;
-                var command = e.PrivateMessage.Message.Substring(prefix.Length, space);
-                var parameters = e.PrivateMessage.Message.Substring(command.Length).Trim().Split(' ');
+                    space = e.PrivateMessage.Message.Length;
+                var command = e.PrivateMessage.Message.Substring(prefix.Length, space - prefix.Length);
+                var parameters = e.PrivateMessage.Message.Substring(command.Length + prefix.Length).Trim().Split(' ');
                 if (handlers.ContainsKey(command))
                 {
-                    handlers[command](parameters, e);
-                    return true;
+                    try
+                    {
+                        handlers[command](parameters, e);
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        // TODO: Log this exception
+                        return false;
+                    }
                 }
             }
             return false;

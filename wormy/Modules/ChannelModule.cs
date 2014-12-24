@@ -35,7 +35,7 @@ namespace wormy.Modules
                             Respond(e, "I already know about {0}.", arguments[0]);
                         }
                     }
-                });
+                }, "join [channel]: Adds the specified channel to the bot's channel list.");
         }
     }
 }
