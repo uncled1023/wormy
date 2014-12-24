@@ -25,7 +25,7 @@ namespace wormy.Modules
 
         void HandleLink(Uri uri, PrivateMessageEventArgs e)
         {
-            HandleCommand(new string[] { uri.ToString() }, e);
+            HandleCommand(new[] { uri.ToString() }, e);
         }
 
         void HandleCommand(string[] arguments, PrivateMessageEventArgs e)

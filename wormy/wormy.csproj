@@ -78,6 +78,7 @@
     <Compile Include="Modules\MediaCrushModule.cs" />
     <Compile Include="Modules\GoogleModule.cs" />
     <Compile Include="Modules\YouTubeModule.cs" />
+    <Compile Include="Modules\MiscSearchesModule.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
