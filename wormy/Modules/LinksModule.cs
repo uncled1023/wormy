@@ -6,6 +6,7 @@ using System.IO;
 using HtmlAgilityPack;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace wormy.Modules
 {
@@ -14,10 +15,15 @@ namespace wormy.Modules
         public override string Name { get { return "links"; } }
         public override string Description { get { return "Recognizes links in the channel and shows information about them."; } }
 
+        public delegate void HostHandler(Uri uri, PrivateMessageEventArgs e);
+        public Dictionary<string, HostHandler> HostHandlers;
+
         private const string UrlRegex = "((([A-Za-z]{3,9}:(?:\\/\\/)?)(?:[-;:&=\\+\\$,\\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\\+\\$,\\w]+@)[A-Za-z0-9.-]+)((?:\\/[\\+~%\\/.\\w-_]*)?\\??(?:[-\\+=&;%@.\\w_]*)#?(?:[\\w]*))?)";
 
         public LinksModule(NetworkManager network) : base(network)
         {
+            HostHandlers = new Dictionary<string, HostHandler>();
+
             MatchRegex(UrlRegex, (e, matches) => Task.Factory.StartNew(() =>
                 {
                     foreach (Match match in matches)
@@ -29,17 +35,28 @@ namespace wormy.Modules
                         {
                             if (uri.Scheme == "http" || uri.Scheme == "https")
                             {
-                                // TODO: Domain handlers
-                                var title = FetchPageTitle(uri.ToString());
-                                Respond(e, "{0}: \"{1}\"", uri.Host, title);
+                                if (HostHandlers.ContainsKey(uri.Host))
+                                    HostHandlers[uri.Host](uri, e);
+                                else
+                                {
+                                    var title = FetchPageTitle(uri.ToString());
+                                    if (title != null)
+                                        Respond(e, "{0}: \"{1}\"", uri.Host, title);
+                                }
                             }
                         }
                     }
                 }));
         }
 
+        public void RegisterHostHandler(string host, HostHandler handler)
+        {
+            HostHandlers[host] = handler;
+        }
+
         public static string FetchPageTitle(string url)
         {
+            // TODO: Handle this in a way that is less stupid (start with a HEAD, perhaps)
             try
             {
                 WebClient wc = new WebClient(); // I'm sorry, okay?

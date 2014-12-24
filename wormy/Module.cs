@@ -53,6 +53,18 @@ namespace wormy
             }
         }
 
+        protected T GetModule<T>() where T : Module
+        {
+            foreach (var module in NetworkManager.Modules)
+            {
+                if (module.GetType() == typeof(T))
+                {
+                    return module as T;
+                }
+            }
+            throw new Exception("Unable to locate dependent module");
+        }
+
         protected void MatchRegex(string regex, RegexHandler handler, RegexOptions options = RegexOptions.None)
         {
             RegexHandlers.Add(new Regex(regex, RegexOptions.Compiled | options), handler);
