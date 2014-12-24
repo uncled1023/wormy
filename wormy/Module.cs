@@ -19,6 +19,7 @@ namespace wormy
         internal Dictionary<Regex, RegexHandler> RegexHandlers;
 
         protected NetworkManager NetworkManager { get; set; }
+        protected string CommandPrefix { get; private set; }
 
         public abstract string Name { get; }
         public abstract string Description { get; }
@@ -57,10 +58,8 @@ namespace wormy
         {
             foreach (var module in NetworkManager.Modules)
             {
-                if (module.GetType() == typeof(T))
-                {
+                if (module is T)
                     return module as T;
-                }
             }
             throw new Exception("Unable to locate dependent module");
         }
@@ -96,9 +95,7 @@ namespace wormy
             {
                 var matches = handler.Key.Matches(e.PrivateMessage.Message);
                 if (matches.Count != 0)
-                {
                     handler.Value(e, matches);
-                }
             }
             return HandleMessage(UserCommandHandlers, e);
         }
@@ -112,7 +109,10 @@ namespace wormy
                 {
                     var channel = session.Query<WormyChannel>().SingleOrDefault(cw => cw.Name == e.PrivateMessage.Source);
                     if (channel != null)
+                    {
                         prefix = channel.CommandPrefix;
+                        CommandPrefix = prefix;
+                    }
                 }
             }
             else

@@ -22,7 +22,10 @@ namespace wormy
             Configuration = config;
             Modules = new List<Module>();
             Client = new IrcClient(config.Address, new IrcUser(config.Nick, config.User, config.Password, config.RealName));
+            Client.RawMessageRecieved += (sender, e) => Console.WriteLine("<< {0}", e.Message);
+            Client.RawMessageSent += (sender, e) => Console.WriteLine(">> {0}", e.Message);
             Client.ConnectionComplete += HandleConnectionComplete;
+            Client.NetworkError += (sender, e) => Console.WriteLine("Network error {0}", e.SocketError);
             Client.ConnectAsync();
         }
 
@@ -56,6 +59,26 @@ namespace wormy
             RegisterModules();
             Client.ChannelMessageRecieved += HandleMessageRecieved;
             Client.UserMessageRecieved += HandleMessageRecieved;
+            if (!Configuration.MessageNickServ)
+                JoinChannels();
+            else
+            {
+                Client.NoticeRecieved += HandleNickServ;
+                Client.SendMessage("identify " + Configuration.Password, "NickServ");
+            }
+        }
+
+        void HandleNickServ(object sender, IrcNoticeEventArgs e)
+        {
+            if (new IrcUser(e.Source).Nick == "NickServ" && e.Notice.StartsWith("Password accepted"))
+            {
+                JoinChannels();
+                Client.NoticeRecieved -= HandleNickServ;
+            }
+        }
+
+        void JoinChannels()
+        {
             using (var session = Program.Database.SessionFactory.OpenSession())
             {
                 var channels = session.Query<WormyChannel>().Where(cw => cw.Network == Configuration.Name).Select(cw => cw.Name);

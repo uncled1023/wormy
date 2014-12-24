@@ -18,6 +18,7 @@
     <WarningLevel>4</WarningLevel>
     <Externalconsole>true</Externalconsole>
     <PlatformTarget>x86</PlatformTarget>
+    <Commandlineparameters>debug.json</Commandlineparameters>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>full</DebugType>
@@ -83,6 +84,8 @@
     <Compile Include="Modules\RedditModule.cs" />
     <Compile Include="Database\ChannelUser.cs" />
     <Compile Include="Modules\TrackingModule.cs" />
+    <Compile Include="Modules\SedModule.cs" />
+    <Compile Include="Modules\BotsModule.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

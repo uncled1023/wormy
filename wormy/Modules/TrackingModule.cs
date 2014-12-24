@@ -31,6 +31,8 @@ namespace wormy.Modules
 
         void HandleChannelMessageRecieved(object sender, PrivateMessageEventArgs e)
         {
+            if (e.PrivateMessage.Message.StartsWith(CommandPrefix + "seen"))
+                return;
             using (var session = Program.Database.SessionFactory.OpenSession())
             {
                 using (var transaction = session.BeginTransaction())
