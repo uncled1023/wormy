@@ -38,6 +38,11 @@ namespace wormy.Modules
                 
             RegisterUserCommand("moe", (arguments, e) => Task.Factory.StartNew(() =>
                 {
+                    if (reddit == null)
+                    {
+                        RespondTo(e, "Sorry - I was just restarted and I'm still initializing the moe service.");
+                        return;
+                    }
                     if (arguments.Length == 1 && arguments[0].StartsWith("@"))
                     {
                         string username = arguments[0].Substring(1);
@@ -45,7 +50,9 @@ namespace wormy.Modules
                             username = e.PrivateMessage.User.Nick;
                         using (var session = Program.Database.SessionFactory.OpenSession())
                         {
-                            var user = session.Query<ChannelUser>().SingleOrDefault(u => u.Nick.ToUpper() == username.ToUpper());
+                            var channel = session.Query<WormyChannel>().SingleOrDefault(c => c.Name == e.PrivateMessage.Source);
+                            var user = session.Query<ChannelUser>().SingleOrDefault(u => u.Nick.ToUpper() == username.ToUpper()
+                                && u.Channels.Any(c => c == channel));
                             if (user == null)
                             {
                                 RespondTo(e, "Sorry, I'm not familiar with that user");
@@ -100,7 +107,8 @@ namespace wormy.Modules
                     {
                         using (var transaction = session.BeginTransaction())
                         {
-                            var user = session.Query<ChannelUser>().SingleOrDefault(u => u.Nick == e.PrivateMessage.User.Nick);
+                            var channel = session.Query<WormyChannel>().SingleOrDefault(c => c.Name == e.PrivateMessage.Source);
+                            var user = session.Query<ChannelUser>().SingleOrDefault(u => u.Nick == e.PrivateMessage.User.Nick && u.Channels.Any(c => c == channel));
                             user.SavedPosts.Add(LastPost);
                             LastPost.SavedUsers.Add(user);
                             session.SaveOrUpdate(user);
