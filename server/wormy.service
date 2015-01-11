@@ -1,0 +1,11 @@
+[Unit]
+Description=An IRC bot
+After=network.target
+After=postgresql.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/mono --debug /usr/local/bin/wormy.exe /etc/wormy.json
+
+[Install]
+WantedBy=multi-user.target

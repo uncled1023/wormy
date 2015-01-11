@@ -1,0 +1,13 @@
+[Unit]
+Description=Wormy web service
+Wants=network.target
+Before=network.target
+
+[Service]
+User=service
+WorkingDirectory=/var/http/wormy/
+ExecStart=/var/http/wormy/bin/gunicorn app:app -b 127.0.0.1:8000
+ExecStop=/usr/bin/pkill gunicorn
+
+[Install]
+WantedBy=multi-user.target
