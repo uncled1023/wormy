@@ -9,10 +9,12 @@ namespace wormy.Database
         public ChannelUser()
         {
             Channels = new List<WormyChannel>();
+            SavedPosts = new List<MoePost>();
         }
 
         public virtual int Id { get; protected set; }
         public virtual IList<WormyChannel> Channels { get; protected set; }
+        public virtual IList<MoePost> SavedPosts { get; protected set; }
         public virtual string Nick { get; set; }
         public virtual DateTime LastSeen { get; set; }
         public virtual string LastSaid { get; set; }
@@ -34,6 +36,9 @@ namespace wormy.Database
                 HasManyToMany(m => m.Channels)
                     .Cascade.All()
                     .Table("UserChannel");
+                HasManyToMany(m => m.SavedPosts)
+                    .Cascade.All()
+                    .Table("UserMoe");
             }
         }
     }
