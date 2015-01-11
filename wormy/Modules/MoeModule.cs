@@ -39,7 +39,7 @@ namespace wormy.Modules
                     {
                         var channel = session.Query<WormyChannel>().SingleOrDefault(c => c.Name == e.PrivateMessage.Source);
                         // Finds the first post that has yet to be mentioned in this channel
-                        var post = listing.FirstOrDefault(p => !session.Query<MoePost>().Any(mp => mp.Channel == channel && mp.RedditId == p.Id));
+                        var post = listing.FirstOrDefault(p => !p.IsSelfPost && !session.Query<MoePost>().Any(mp => mp.Channel == channel && mp.RedditId == p.Id));
                         if (post == null)
                             RespondTo(e, "Sorry! I'm all out of moe.");
                         else

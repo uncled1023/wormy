@@ -86,6 +86,8 @@
     <Compile Include="Modules\TrackingModule.cs" />
     <Compile Include="Modules\SedModule.cs" />
     <Compile Include="Modules\BotsModule.cs" />
+    <Compile Include="Modules\IgnoreModule.cs" />
+    <Compile Include="Database\IgnoredMask.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

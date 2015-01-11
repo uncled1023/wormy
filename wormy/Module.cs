@@ -127,9 +127,10 @@ namespace wormy
                 var parameters = e.PrivateMessage.Message.Substring(command.Length + prefix.Length).Trim().Split(' ');
                 if (handlers.ContainsKey(command))
                 {
+                    handlers[command](parameters, e);
                     try
                     {
-                        handlers[command](parameters, e);
+                        //handlers[command](parameters, e);
                         return true;
                     }
                     catch (Exception ex)

@@ -16,6 +16,7 @@ namespace wormy
         public List<Module> Modules { get; set; }
 
         public event EventHandler ModulesLoaded;
+        public event EventHandler<PrivateMessageEventArgs> HandleMessageBeforeModules;
 
         public NetworkManager(Configuration.NetworkConfiguration config)
         {
@@ -26,6 +27,7 @@ namespace wormy
             Client.RawMessageSent += (sender, e) => Console.WriteLine(">> {0}", e.Message);
             Client.ConnectionComplete += HandleConnectionComplete;
             Client.NetworkError += (sender, e) => Console.WriteLine("Network error {0}", e.SocketError);
+            Client.Settings.WhoIsOnJoin = true;
             Client.ConnectAsync();
         }
 
@@ -88,6 +90,8 @@ namespace wormy
 
         void HandleMessageRecieved(object sender, PrivateMessageEventArgs e)
         {
+            if (HandleMessageBeforeModules != null)
+                HandleMessageBeforeModules(this, e);
             if (Program.Configuration.AdminMasks.Any(e.PrivateMessage.User.Match))
             {
                 if (HandleAdminMessage(e))

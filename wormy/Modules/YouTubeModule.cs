@@ -21,6 +21,7 @@ namespace wormy.Modules
         {
             RegisterUserCommand("youtube", HandleCommand, "youtube [terms]: Searches YouTube for [terms] and shows information about the first result.");
             RegisterUserCommand("yt", HandleCommand);
+            network.ModulesLoaded += (sender, e) => GetModule<LinksModule>().RegisterHostHandler("www.youtube.com", HandleLink);
             network.ModulesLoaded += (sender, e) => GetModule<LinksModule>().RegisterHostHandler("youtube.com", HandleLink);
             network.ModulesLoaded += (sender, e) => GetModule<LinksModule>().RegisterHostHandler("youtu.be", HandleLink);
         }

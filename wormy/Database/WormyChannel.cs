@@ -6,6 +6,11 @@ namespace wormy.Database
 {
     public class WormyChannel
     {
+        public WormyChannel()
+        {
+            Users = new List<ChannelUser>();
+        }
+
         public virtual int Id { get; protected set; }
         public virtual string Network { get; set; }
         public virtual string Name { get; set; }
