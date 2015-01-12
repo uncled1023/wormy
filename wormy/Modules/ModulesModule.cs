@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Diagnostics;
 
 namespace wormy.Modules
 {
@@ -27,6 +28,10 @@ namespace wormy.Modules
                 {
                     network.Client.SendRawMessage(string.Join(" ", arguments));
                 }, "raw [text]: Sends a raw IRC message");
+            RegisterAdminCommand("reload", (arguments, e) => 
+            {
+                Process.GetCurrentProcess().Kill();
+            }, "reload: Kills the bot. You should have a watchdog of some sort to restart it.");
         }
     }
 }
