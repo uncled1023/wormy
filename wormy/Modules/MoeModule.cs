@@ -103,7 +103,9 @@ namespace wormy.Modules
                 }), "moe [terms]: Finds a moe pic based on search [terms]. Omit terms for a random pic.");
             NetworkManager.Client.ChannelMessageRecieved += (sender, e) => Task.Factory.StartNew(() =>
             {
-                if (e.PrivateMessage.Message.Trim().ToUpper() == "SAVED" && (DateTime.Now - LastMoeDate).TotalSeconds < 60)
+                if ((e.PrivateMessage.Message.Trim().ToUpper() == "SAVED"
+                    || e.PrivateMessage.Message.Trim().ToUpper() == "FUCKING SAVED")
+                    && (DateTime.Now - LastMoeDate).TotalSeconds < 60)
                 {
                     using (var session = Program.Database.SessionFactory.OpenSession())
                     {
