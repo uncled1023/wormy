@@ -93,6 +93,7 @@
     <Compile Include="Database\IgnoredMask.cs" />
     <Compile Include="Modules\ReminderModule.cs" />
     <Compile Include="Database\Reminder.cs" />
+    <Compile Include="Modules\PersonalityModule.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

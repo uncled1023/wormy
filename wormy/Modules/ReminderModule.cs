@@ -21,10 +21,10 @@ namespace wormy.Modules
         public ReminderModule(NetworkManager network)
             : base(network)
         {
-            MatchRegex("^ *" + network.Client.User.Nick + "(,|:) *remind me (?<time>(in|at) .*) +to +(?<action>.*) *$", HandleMatches, RegexOptions.IgnoreCase);
-            MatchRegex("^ *remind me (?<time>(in|at) .*) +to +(?<action>.*)(,|:) *" + network.Client.User.Nick + " *$", HandleMatches, RegexOptions.IgnoreCase);
-            MatchRegex("^ *" + network.Client.User.Nick + "(,|:) *remind me to +(?<action>.*) (?<time>(in|at) .*) *$", HandleMatches, RegexOptions.IgnoreCase);
-            MatchRegex("^ *remind me to +(?<action>.*) (?<time>(in|at) .*)(,|:) *" + network.Client.User.Nick + " *$", HandleMatches, RegexOptions.IgnoreCase);
+            MatchRegex("^ *" + network.Client.User.Nick + "(,|:) *remind me (?<time>(in|at|tomorrow).*) +to +(?<action>.*) *$", HandleMatches, RegexOptions.IgnoreCase);
+            MatchRegex("^ *remind me (?<time>(in|at|tomorrow).*) +to +(?<action>.*)(,|:) *" + network.Client.User.Nick + " *$", HandleMatches, RegexOptions.IgnoreCase);
+            MatchRegex("^ *" + network.Client.User.Nick + "(,|:) *remind me to +(?<action>.*) (?<time>(in|at|tomorrow).*) *$", HandleMatches, RegexOptions.IgnoreCase);
+            MatchRegex("^ *remind me to +(?<action>.*) (?<time>(in|at|tomorrow).*)(,|:) *" + network.Client.User.Nick + " *$", HandleMatches, RegexOptions.IgnoreCase);
 
             Reminders = new List<Reminder>();
             using (var session = Program.Database.SessionFactory.OpenSession())
@@ -53,6 +53,7 @@ namespace wormy.Modules
                         Reminders.Remove(reminder);
                         NetworkManager.Client.SendMessage(string.Format("{0}: Reminder to {1}", reminder.Target, reminder.Action), reminder.Source);
                         session.Delete(reminder);
+                        session.Flush();
                     }
                 }
             }

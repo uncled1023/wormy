@@ -54,6 +54,11 @@ namespace wormy.Modules
                         RespondTo(e, "I'm already ignoring this person.");
                         return;
                     }
+                    if (e.PrivateMessage.User.Match(args[0]))
+                    {
+                        Respond(e, "That mask matches YOU, dumbass.");
+                        return;
+                    }
                     Masks[e.PrivateMessage.Source] = Masks[e.PrivateMessage.Source].Concat(new[] { args[0] }).ToArray();
                     var match = NetworkManager.Client.Channels[e.PrivateMessage.Source].Users.SingleOrDefault(u => u.Match(args[0]));
                     if (match == null)
