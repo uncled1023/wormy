@@ -66,6 +66,8 @@ namespace wormy.Modules
                                     var moe = user.SavedPosts[random.Next(user.SavedPosts.Count)];
                                     var post = reddit.GetThingByFullname("t3_" + moe.RedditId);
                                     RespondWithMoe(e, (Post)post, user);
+                                    LastMoeDate = DateTime.Now;
+                                    LastPost = moe;
                                 }
                             }
                         }
@@ -101,7 +103,7 @@ namespace wormy.Modules
                 }), "moe [terms]: Finds a moe pic based on search [terms]. Omit terms for a random pic.");
             NetworkManager.Client.ChannelMessageRecieved += (sender, e) => Task.Factory.StartNew(() =>
             {
-                if (e.PrivateMessage.Message.Trim().ToUpper() == "SAVED" && (DateTime.Now - LastMoeDate).TotalSeconds < 30)
+                if (e.PrivateMessage.Message.Trim().ToUpper() == "SAVED" && (DateTime.Now - LastMoeDate).TotalSeconds < 60)
                 {
                     using (var session = Program.Database.SessionFactory.OpenSession())
                     {
