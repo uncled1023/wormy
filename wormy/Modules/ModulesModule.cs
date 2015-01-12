@@ -23,6 +23,10 @@ namespace wormy.Modules
                     else
                         Respond(e, "Module description: {0}", mod.Description);
                 }, "modinfo [module]: Gives information about the specified module");
+            RegisterAdminCommand("raw", (arguments, e) => 
+                {
+                    network.Client.SendRawMessage(e.PrivateMessage.Message);
+                }, "raw [text]: Sends a raw IRC message");
         }
     }
 }
