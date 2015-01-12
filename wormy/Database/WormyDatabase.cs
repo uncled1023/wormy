@@ -22,6 +22,7 @@ namespace wormy.Database
                 .Mappings(m => m.FluentMappings.Add<ChannelUser.Mapping>())
                 .Mappings(m => m.FluentMappings.Add<WormyChannel.Mapping>())
                 .Mappings(m => m.FluentMappings.Add<IgnoredMask.Mapping>())
+                .Mappings(m => m.FluentMappings.Add<Reminder.Mapping>())
                 .ExposeConfiguration(BuildSchema)
                 .BuildSessionFactory();
         }
