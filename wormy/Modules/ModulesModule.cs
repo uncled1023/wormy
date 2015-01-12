@@ -25,7 +25,7 @@ namespace wormy.Modules
                 }, "modinfo [module]: Gives information about the specified module");
             RegisterAdminCommand("raw", (arguments, e) => 
                 {
-                    network.Client.SendRawMessage(e.PrivateMessage.Message);
+                    network.Client.SendRawMessage(string.Join(" ", arguments));
                 }, "raw [text]: Sends a raw IRC message");
         }
     }
