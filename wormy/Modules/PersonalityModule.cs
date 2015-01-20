@@ -14,7 +14,7 @@ namespace wormy.Modules
             var random = new Random();
             
             string[] gratitudeResponses = new[] { "You're welcome!", "Sure thing!", "Any time!", "My pleasure." };
-            MatchRegex("^ *thank(s| you),? *wormy *$", (PrivateMessageEventArgs e, MatchCollection matches) => 
+            MatchRegex("^ *thank(s| you),? *" + network.Client.User.Nick + " *$", (PrivateMessageEventArgs e, MatchCollection matches) => 
             {
                 Respond(e, gratitudeResponses[random.Next(gratitudeResponses.Length)]);
             }, RegexOptions.Compiled);

@@ -117,20 +117,30 @@ namespace wormy
             }
             else
                 prefix = ""; // User messages require no prefix
-
-            if (prefix != null && e.PrivateMessage.Message.StartsWith(prefix))
+            
+            var message = e.PrivateMessage.Message;
+            if (message.Contains("[[") && message.Contains("]]"))
             {
-                var space = e.PrivateMessage.Message.IndexOf(' ');
+                var open = message.IndexOf("[[") + 2;
+                var close = message.IndexOf("]]");
+                if (open < close)
+                {
+                    message = message.Substring(open, close - open);
+                }
+            }
+
+            if (prefix != null && message.StartsWith(prefix))
+            {
+                var space = message.IndexOf(' ');
                 if (space == -1)
-                    space = e.PrivateMessage.Message.Length;
-                var command = e.PrivateMessage.Message.Substring(prefix.Length, space - prefix.Length);
-                var parameters = e.PrivateMessage.Message.Substring(command.Length + prefix.Length).Trim().Split(' ');
+                    space = message.Length;
+                var command = message.Substring(prefix.Length, space - prefix.Length);
+                var parameters = message.Substring(command.Length + prefix.Length).Trim().Split(' ');
                 if (handlers.ContainsKey(command))
                 {
-                    handlers[command](parameters, e);
                     try
                     {
-                        //handlers[command](parameters, e);
+                        handlers[command](parameters, e);
                         return true;
                     }
                     catch (Exception ex)

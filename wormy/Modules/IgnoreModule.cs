@@ -68,7 +68,7 @@ namespace wormy.Modules
 
                     using (var session = Program.Database.SessionFactory.OpenSession())
                     {
-                        var channel = session.Query<WormyChannel>().SingleOrDefault(c => c.Name == e.PrivateMessage.Source);
+                        var channel = session.Query<WormyChannel>().FirstOrDefault(c => c.Name == e.PrivateMessage.Source);
                         var ignored = new IgnoredMask();
                         ignored.Mask = args[0];
                         ignored.Channel = channel;
