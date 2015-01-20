@@ -9,5 +9,4 @@ TestResults/
 *.mdf
 *.psess
 *.vsp
-externals/
 packages/*
