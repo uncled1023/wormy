@@ -28,6 +28,7 @@ namespace wormy
             Client.ConnectionComplete += HandleConnectionComplete;
             Client.NetworkError += (sender, e) => Console.WriteLine("Network error {0}", e.SocketError);
             Client.Settings.WhoIsOnJoin = true;
+            Client.PrivmsgPrefix = "\u200B";
             Client.ConnectAsync();
         }
 
@@ -90,6 +91,8 @@ namespace wormy
 
         void HandleMessageRecieved(object sender, PrivateMessageEventArgs e)
         {
+            if (e.PrivateMessage.Message.StartsWith("\u200B"))
+                return;
             if (HandleMessageBeforeModules != null)
                 HandleMessageBeforeModules(this, e);
             if (Program.Configuration.AdminMasks.Any(e.PrivateMessage.User.Match))
