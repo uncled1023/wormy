@@ -55,12 +55,12 @@ namespace wormy.Modules
             }
         }
 
-        string FriendlyTimeSpan(TimeSpan span)
+        public static string FriendlyTimeSpan(TimeSpan span)
         {
             if (span.TotalSeconds < 60)
                 return string.Format("{0} seconds ago", (int)span.TotalSeconds);
             if (span.TotalMinutes < 60)
-                return string.Format("{0} minutes, {1} seconds ago", (int)span.TotalMinutes, (int)span.Seconds);
+                return string.Format("{0} minutes ago", (int)span.TotalMinutes);
             if (span.TotalHours < 24)
                 return string.Format("{0} hours, {1} minutes ago", (int)span.TotalHours, (int)span.Minutes);
             return string.Format("{0} days ago", (int)span.TotalDays);

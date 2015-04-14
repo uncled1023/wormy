@@ -30,6 +30,8 @@ namespace wormy
         public RedditConfiguration Reddit { get; set; }
         [JsonProperty("adminMasks")]
         public string[] AdminMasks { get; set; }
+        [JsonProperty("osuApiKey")]
+        public string OsuAPIKey { get; set; }
 
         public class DatabaseConfiguration
         {
