@@ -95,6 +95,7 @@
     <Compile Include="Database\Reminder.cs" />
     <Compile Include="Modules\PersonalityModule.cs" />
     <Compile Include="Modules\KnightOSModule.cs" />
+    <Compile Include="Modules\ShellModule.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

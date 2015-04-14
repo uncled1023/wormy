@@ -38,6 +38,7 @@ namespace wormy.Modules
                 using (var transaction = session.BeginTransaction())
                 {
                     var channel = session.Query<WormyChannel>().SingleOrDefault(c => c.Name == e.PrivateMessage.Source);
+                    if (channel == null) return;
                     var user = session.Query<ChannelUser>().SingleOrDefault(u => u.Nick == e.PrivateMessage.User.Nick && u.Channels.Any(c => c == channel));
                     if (user == null)
                     {

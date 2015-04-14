@@ -28,7 +28,6 @@ namespace wormy
             Client.ConnectionComplete += HandleConnectionComplete;
             Client.NetworkError += (sender, e) => Console.WriteLine("Network error {0}", e.SocketError);
             Client.Settings.WhoIsOnJoin = true;
-            Client.PrivmsgPrefix = "\u200B";
             Client.ConnectAsync();
         }
 
