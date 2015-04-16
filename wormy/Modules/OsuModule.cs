@@ -2,6 +2,9 @@
 using System.Net;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using wormy.Database;
+using NHibernate.Linq;
+using System.Linq;
 
 namespace wormy.Modules
 {
@@ -16,8 +19,19 @@ namespace wormy.Modules
                 return;
             RegisterUserCommand("osu", (a, e) =>
             {
-                if (a.Length != 1)
+                if (a.Length > 1)
                     return;
+                if (a.Length == 0)
+                    a = new[] { e.PrivateMessage.User.Nick };
+                OsuAlias alias = null;
+                using (var session = Program.Database.SessionFactory.OpenSession())
+                {
+                    var channel = session.Query<WormyChannel>().SingleOrDefault(c => c.Name == e.PrivateMessage.Source);
+                    if (channel == null) return;
+                    alias = session.Query<OsuAlias>().SingleOrDefault(u => u.IrcNick.ToUpper() == a[0].ToUpper() && u.Channel == channel);
+                    if (alias != null)
+                        a[0] = alias.OsuNick;
+                }
                 var client = new WebClient();
                 const string userApi = "https://osu.ppy.sh/api/get_user?k={0}&u={1}";
                 const string recentApi = "https://osu.ppy.sh/api/get_user_recent?k={0}&u={1}";
@@ -32,50 +46,58 @@ namespace wormy.Modules
                         Program.Configuration.OsuAPIKey,
                         Uri.EscapeUriString(a[0])
                     )));
-                    var map = JToken.Parse(client.DownloadString(string.Format(beatmapApi,
-                        Program.Configuration.OsuAPIKey,
-                        recent[0]["beatmap_id"].Value<int>()
-                    )));
+                    JToken map = null;
                     var mods = new List<string>();
-                    var modse = (Mods)recent[0]["enabled_mods"].Value<int>();
-                    if ((modse & Mods.DoubleTime) == Mods.DoubleTime) mods.Add("DT");
-                    if ((modse & Mods.Easy) == Mods.Easy) mods.Add("EZ");
-                    if ((modse & Mods.Flashlight) == Mods.Flashlight) mods.Add("FL");
-                    if ((modse & Mods.HalfTime) == Mods.HalfTime) mods.Add("HT");
-                    if ((modse & Mods.HardRock) == Mods.HardRock) mods.Add("HR");
-                    if ((modse & Mods.Hidden) == Mods.Hidden) mods.Add("HD");
-                    if ((modse & Mods.Nightcore) == Mods.Nightcore) mods.Add("NC");
-                    if ((modse & Mods.NoFail) == Mods.NoFail) mods.Add("NF");
-                    if ((modse & Mods.Perfect) == Mods.Perfect) mods.Add("PF");
-                    if ((modse & Mods.SuddenDeath) == Mods.SuddenDeath) mods.Add("SD");
-                    if ((modse & Mods.SpunOut) == Mods.SpunOut) mods.Add("SO");
                     var modString = "No Mods";
-                    if (mods.Count != 0)
-                        modString = string.Join("/", mods);
+                    if (((JArray)recent).Count != 0)
+                    {
+                        map = JToken.Parse(client.DownloadString(string.Format(beatmapApi,
+                            Program.Configuration.OsuAPIKey,
+                            recent[0]["beatmap_id"].Value<int>()
+                        )));
+                        var modse = (Mods)recent[0]["enabled_mods"].Value<int>();
+                        if ((modse & Mods.DoubleTime) == Mods.DoubleTime) mods.Add("DT");
+                        if ((modse & Mods.Easy) == Mods.Easy) mods.Add("EZ");
+                        if ((modse & Mods.Flashlight) == Mods.Flashlight) mods.Add("FL");
+                        if ((modse & Mods.HalfTime) == Mods.HalfTime) mods.Add("HT");
+                        if ((modse & Mods.HardRock) == Mods.HardRock) mods.Add("HR");
+                        if ((modse & Mods.Hidden) == Mods.Hidden) mods.Add("HD");
+                        if ((modse & Mods.Nightcore) == Mods.Nightcore) mods.Add("NC");
+                        if ((modse & Mods.NoFail) == Mods.NoFail) mods.Add("NF");
+                        if ((modse & Mods.Perfect) == Mods.Perfect) mods.Add("PF");
+                        if ((modse & Mods.SuddenDeath) == Mods.SuddenDeath) mods.Add("SD");
+                        if ((modse & Mods.SpunOut) == Mods.SpunOut) mods.Add("SO");
+                        if (mods.Count != 0)
+                            modString = string.Join("/", mods);
+                    }
 
                     var date = DateTime.Parse(recent[0]["date"].Value<string>() + " +8");
                     const string responseFormatA = "{0} is ranked #{1:N0} with {2:N0}pp, at level {3:0}. "
-                        + "{0}'s accuracy is {4:0}% over {5:N0} plays.";
+                        + "{6}'s accuracy is {4:0}% over {5:N0} plays.";
                     const string responseFormatB = "{0} last played {3} - {4} ({5:N1} stars, {7}) and scored {1:N0} ({2}{8}) {6}.";
                     Respond(e, responseFormatA,
-                        user[0]["username"].Value<string>(),
+                        alias == null ? user[0]["username"].Value<string>() : user[0]["username"].Value<string>() + " (aka " + alias.IrcNick + ")",
                         user[0]["pp_rank"].Value<int>(),
                         user[0]["pp_raw"].Value<double>(),
                         user[0]["level"].Value<double>(),
                         user[0]["accuracy"].Value<double>(),
-                        user[0]["playcount"].Value<double>()
+                        user[0]["playcount"].Value<double>(),
+                        user[0]["username"].Value<string>()
                     );
-                    Respond(e, responseFormatB,
-                        user[0]["username"].Value<string>(),
-                        recent[0]["score"].Value<int>(),
-                        recent[0]["rank"].Value<string>(),
-                        map[0]["artist"].Value<string>(),
-                        map[0]["title"].Value<string>(),
-                        map[0]["difficultyrating"].Value<double>(),
-                        TrackingModule.FriendlyTimeSpan(DateTime.Now - date),
-                        modString,
-                        recent[0]["perfect"].Value<int>() == 1 ? " - Full Combo" : ""
-                    );
+                    if (map != null)
+                    {
+                        Respond(e, responseFormatB,
+                            user[0]["username"].Value<string>(),
+                            recent[0]["score"].Value<int>(),
+                            recent[0]["rank"].Value<string>(),
+                            map[0]["artist"].Value<string>(),
+                            map[0]["title"].Value<string>(),
+                            map[0]["difficultyrating"].Value<double>(),
+                            TrackingModule.FriendlyTimeSpan(DateTime.Now - date),
+                            modString,
+                            recent[0]["perfect"].Value<int>() == 1 ? " - Full Combo" : ""
+                        );
+                    }
                 }
                 catch (WebException ex)
                 {
@@ -85,8 +107,44 @@ namespace wormy.Modules
             }, ".osu [user]: Fetches info about [user]'s osu profile");
             RegisterUserCommand("osua", (a, e) =>
             {
-                
-            }, ".osua [alias]: Sets your osu alias (if your IRC nick != your osu handle)");
+                if (a.Length != 1)
+                    return;
+                using (var session = Program.Database.SessionFactory.OpenSession())
+                {
+                    using (var transaction = session.BeginTransaction())
+                    {
+                        var channel = session.Query<WormyChannel>().SingleOrDefault(c => c.Name == e.PrivateMessage.Source);
+                        if (channel == null) return;
+                        var alias = session.Query<OsuAlias>().SingleOrDefault(
+                            u => u.IrcNick.ToUpper() == e.PrivateMessage.User.Nick.ToUpper() && u.Channel == channel);
+                        if (a[0] == "--drop")
+                        {
+                            if (alias == null)
+                            {
+                                RespondTo(e, "You haven't set an alias.");
+                                return;
+                            }
+                            session.Delete(alias);
+                            transaction.Commit();
+                            RespondTo(e, "Your alias has been removed.");
+                            return;
+                        }
+                        if (alias == null)
+                        {
+                            alias = new OsuAlias
+                            {
+                                IrcNick = e.PrivateMessage.User.Nick,
+                                OsuNick = a[0],
+                                Channel = channel
+                            };
+                        }
+                        alias.OsuNick = a[0];
+                        session.SaveOrUpdate(alias);
+                        transaction.Commit();
+                        RespondTo(e, "Your alias has been set.");
+                    }
+                }
+            }, ".osua [alias]: Sets your osu alias (if your IRC nick != your osu handle). Use --drop to remove alias.");
         }
 
         [Flags]
