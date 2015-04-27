@@ -98,6 +98,7 @@ namespace wormy.Modules
                             recent[0]["perfect"].Value<int>() == 1 ? " - Full Combo" : ""
                         );
                     }
+                    Respond(e, "https://osu.ppy.sh/u/{0}", Uri.EscapeUriString(a[0]);
                 }
                 catch (WebException ex)
                 {
