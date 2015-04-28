@@ -99,7 +99,6 @@ namespace wormy.Modules
                             recent[0]["perfect"].Value<int>() == 1 ? " - Full Combo" : ""
                         );
                     }
-                    Respond(e, "", );
                 }
                 catch (WebException ex)
                 {
