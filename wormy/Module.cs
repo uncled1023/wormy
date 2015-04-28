@@ -135,7 +135,8 @@ namespace wormy
                 if (space == -1)
                     space = message.Length;
                 var command = message.Substring(prefix.Length, space - prefix.Length);
-                var parameters = message.Substring(command.Length + prefix.Length).Trim().Split(' ');
+                var parameters = message.Substring(command.Length + prefix.Length)
+                    .Trim().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 if (handlers.ContainsKey(command))
                 {
                     try
