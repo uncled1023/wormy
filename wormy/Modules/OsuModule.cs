@@ -72,11 +72,12 @@ namespace wormy.Modules
                     }
 
                     var date = DateTime.Parse(recent[0]["date"].Value<string>() + " +8");
-                    const string responseFormatA = "{0} is ranked #{1:N0} with {2:N0}pp, at level {3:0}. "
-                        + "{6}'s accuracy is {4:0}% over {5:N0} plays.";
+                    const string responseFormatA = "{0} [https://osu.ppy.sh/u/{1}] is #{2:N0} ({3:N0}pp), level {4:0}. "
+                        + "{5:0}% accuracy {6:N0} plays.";
                     const string responseFormatB = "{0} last played {3} - {4} ({5:N1} stars, {7}) and scored {1:N0} ({2}{8}) {6}.";
                     Respond(e, responseFormatA,
                         alias == null ? user[0]["username"].Value<string>() : user[0]["username"].Value<string>() + " (aka " + alias.IrcNick + ")",
+                        Uri.EscapeUriString(a[0]),
                         user[0]["pp_rank"].Value<int>(),
                         user[0]["pp_raw"].Value<double>(),
                         user[0]["level"].Value<double>(),
@@ -98,7 +99,7 @@ namespace wormy.Modules
                             recent[0]["perfect"].Value<int>() == 1 ? " - Full Combo" : ""
                         );
                     }
-                    Respond(e, "https://osu.ppy.sh/u/{0}", Uri.EscapeUriString(a[0]);
+                    Respond(e, "", );
                 }
                 catch (WebException ex)
                 {
