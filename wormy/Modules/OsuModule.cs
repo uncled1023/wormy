@@ -49,6 +49,7 @@ namespace wormy.Modules
                     JToken map = null;
                     var mods = new List<string>();
                     var modString = "No Mods";
+                    DateTime date;
                     if (((JArray)recent).Count != 0)
                     {
                         map = JToken.Parse(client.DownloadString(string.Format(beatmapApi,
@@ -69,9 +70,9 @@ namespace wormy.Modules
                         if ((modse & Mods.SpunOut) == Mods.SpunOut) mods.Add("SO");
                         if (mods.Count != 0)
                             modString = string.Join("/", mods);
+                        date = DateTime.Parse(recent[0]["date"].Value<string>() + " +8");
                     }
 
-                    var date = DateTime.Parse(recent[0]["date"].Value<string>() + " +8");
                     const string responseFormatA = "{0} [https://osu.ppy.sh/u/{1}] is #{2:N0} ({3:N0}pp), level {4:0}. "
                         + "{5:0}% accuracy {6:N0} plays.";
                     const string responseFormatB = "{0} last played {3} - {4} ({5:N1} stars, {7}) and scored {1:N0} ({2}{8}) {6}.";

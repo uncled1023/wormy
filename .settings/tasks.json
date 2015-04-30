@@ -1,0 +1,18 @@
+{
+	"version": "0.1.0",
+	
+	"command": "xbuild",
+ 
+	"showOutput": "silent",
+	
+	"windows": {
+		"command": "msbuild.exe"
+	},
+	
+	// args is the HelloWorld program to compile.
+	"args": [],
+	
+	// use the standard tsc problem matcher to find compile problems
+	// in the output.
+	"problemMatcher": "$msCompile"
+}
