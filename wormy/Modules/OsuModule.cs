@@ -49,7 +49,7 @@ namespace wormy.Modules
                     JToken map = null;
                     var mods = new List<string>();
                     var modString = "No Mods";
-                    DateTime date;
+                    DateTime date = DateTime.MinValue;
                     if (((JArray)recent).Count != 0)
                     {
                         map = JToken.Parse(client.DownloadString(string.Format(beatmapApi,
