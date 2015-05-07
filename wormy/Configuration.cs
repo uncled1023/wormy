@@ -32,6 +32,8 @@ namespace wormy
         public string[] AdminMasks { get; set; }
         [JsonProperty("osuApiKey")]
         public string OsuAPIKey { get; set; }
+        [JsonProperty("googleApiKey")]
+        public string GoogleAPIKey { get; set; }
 
         public class DatabaseConfiguration
         {

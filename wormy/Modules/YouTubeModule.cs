@@ -6,6 +6,8 @@ using System.Linq;
 using System.Globalization;
 using ChatSharp.Events;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using System.Xml;
 
 namespace wormy.Modules
 {
@@ -19,6 +21,8 @@ namespace wormy.Modules
 
         public YouTubeModule(NetworkManager network) : base(network)
         {
+            if (string.IsNullOrEmpty(Program.Configuration.GoogleAPIKey))
+                return;
             RegisterUserCommand("youtube", HandleCommand, "youtube [terms]: Searches YouTube for [terms] and shows information about the first result.");
             RegisterUserCommand("yt", HandleCommand);
             network.ModulesLoaded += (sender, e) => GetModule<LinksModule>().RegisterHostHandler("www.youtube.com", HandleLink);
@@ -118,47 +122,46 @@ namespace wormy.Modules
             try
             {
                 WebClient client = new WebClient();
-                var sr = new StreamReader(client.OpenRead(string.Format("http://gdata.youtube.com/feeds/api/videos/{0}?v=2", Uri.EscapeUriString(vid))));
-                string xml = sr.ReadToEnd();
-                XDocument document = XDocument.Parse(xml);
-                XNamespace media = XNamespace.Get("http://search.yahoo.com/mrss/");
-                XNamespace youtube = XNamespace.Get("http://gdata.youtube.com/schemas/2007");
-                XNamespace root = XNamespace.Get("http://www.w3.org/2005/Atom");
-                XNamespace googleData = XNamespace.Get("http://schemas.google.com/g/2005");
-                Video video = new Video();
-                video.Title = document.Root.Element(root + "title").Value;
-                video.Author = document.Root.Element(root + "author").Element(root + "name").Value;
+                var sr = new StreamReader(client.OpenRead(string.Format(
+                    "https://www.googleapis.com/youtube/v3/videos?part=id%2Csnippet%2Cstatistics%2CcontentDetails%2Cstatus%2Clocalizations&id={0}&key={1}",
+                    Uri.EscapeUriString(vid), Uri.EscapeUriString(Program.Configuration.GoogleAPIKey))));
+                string json = sr.ReadToEnd();
+                JObject j = JObject.Parse(json);
+                if (j["items"].Count() == 0)
+                    return null;
+                dynamic i = j["items"][0];
 
-                video.CommentsEnabled = document.Root.Elements(youtube + "accessControl")
-                .First(e => e.Attribute("action").Value == "comment").Attribute("permission").Value == "allowed";
-                video.RatingsEnabled = document.Root.Elements(youtube + "accessControl")
-                .First(e => e.Attribute("action").Value == "rate").Attribute("permission").Value == "allowed";
+                Video video = new Video();
+                video.Title = i.snippet.title;
+                video.Author = i.snippet.channelTitle;
+
+                video.CommentsEnabled = true; // NOTE: YouTube has removed this from their API, assholes
+                video.RatingsEnabled = i.status.publicStatsViewable;
                 if (video.RatingsEnabled)
+                {
+                    video.Likes = i.statistics.likeCount;
+                    video.Dislikes = i.statistics.dislikeCount;
+                    double average;
+                    if (video.Likes + video.Dislikes == 0) average = 1;
+                    else average = (double)video.Likes / (video.Likes + video.Dislikes);
+                    video.Stars = "\u000303";
+                    int starCount = (int)Math.Round(average * 5);
+                    for (int k = 0; k < 5; k++)
                     {
-                        video.Likes = int.Parse(document.Root.Element(youtube + "rating").Attribute("numLikes").Value);
-                        video.Dislikes = int.Parse(document.Root.Element(youtube + "rating").Attribute("numDislikes").Value);
+                        if (k < starCount)
+                            video.Stars += "★";
+                        else if (k == starCount)
+                            video.Stars += "\u000315☆";
+                        else
+                            video.Stars += "☆";
                     }
-                video.Views = int.Parse(document.Root.Element(youtube + "statistics").Attribute("viewCount").Value);
-                video.Duration = TimeSpan.FromSeconds(
-                    double.Parse(document.Root.Element(media + "group").Element(youtube + "duration").Attribute("seconds").Value));
-                video.RegionLocked = document.Root.Element(media + "group").Element(media + "restriction") != null;
+                    video.Stars += "\u000f";
+                }
+                video.Views = i.statistics.viewCount;
+                video.Duration = XmlConvert.ToTimeSpan(i["contentDetails"]["duration"].Value);
+                video.RegionLocked = i.contentDetails["regionRestriction"] != null;
                 video.VideoUri = new Uri("http://youtu.be/" + vid);
-                video.HD = document.Root.Element(youtube + "hd") != null;
-                if (video.RatingsEnabled)
-                    {
-                        video.Stars = "\u000303";
-                        int starCount = (int)Math.Round(double.Parse(document.Root.Element(googleData + "rating").Attribute("average").Value));
-                        for (int i = 0; i < 5; i++)
-                            {
-                                if (i < starCount)
-                                    video.Stars += "★";
-                                else if (i == starCount)
-                                    video.Stars += "\u000315☆";
-                                else
-                                    video.Stars += "☆";
-                            }
-                        video.Stars += "\u000f";
-                    }
+                video.HD = i.contentDetails.definition == "hd";
                 return video;
             }
             catch
