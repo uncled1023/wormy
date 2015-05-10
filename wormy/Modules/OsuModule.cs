@@ -27,7 +27,7 @@ namespace wormy.Modules
                 OsuAlias alias = null;
                 using (var session = Program.Database.SessionFactory.OpenSession())
                 {
-                    var channel = session.Query<WormyChannel>().SingleOrDefault(c => c.Name == e.PrivateMessage.Source);
+                    var channel = network.Network.Channels.SingleOrDefault(c => c.Name == e.PrivateMessage.Source);
                     if (channel == null) return;
                     alias = session.Query<OsuAlias>().SingleOrDefault(u => u.IrcNick.ToUpper() == a[0].ToUpper() && u.Channel == channel);
                     if (alias != null)
@@ -116,7 +116,7 @@ namespace wormy.Modules
                 {
                     using (var transaction = session.BeginTransaction())
                     {
-                        var channel = session.Query<WormyChannel>().SingleOrDefault(c => c.Name == e.PrivateMessage.Source);
+                        var channel = network.Network.Channels.SingleOrDefault(c => c.Name == e.PrivateMessage.Source);
                         if (channel == null) return;
                         var alias = session.Query<OsuAlias>().SingleOrDefault(
                             u => u.IrcNick.ToUpper() == e.PrivateMessage.User.Nick.ToUpper() && u.Channel == channel);
@@ -189,7 +189,7 @@ namespace wormy.Modules
         public class OsuAlias
         {
             public virtual int Id { get; set; }
-            public virtual WormyChannel Channel { get; set; }
+            public virtual Channel Channel { get; set; }
             public virtual string IrcNick { get; set; }
             public virtual string OsuNick { get; set; }
 
@@ -200,7 +200,7 @@ namespace wormy.Modules
                     Id(m => m.Id);
                     Map(m => m.IrcNick);
                     Map(m => m.OsuNick);
-                    References<WormyChannel>(m => m.Channel).Nullable();
+                    References<Channel>(m => m.Channel).Nullable();
                 }
             }
         }

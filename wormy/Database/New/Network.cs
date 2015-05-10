@@ -46,7 +46,7 @@ namespace wormy.Database
                 Map(mn => mn.RealName);
                 Map(mn => mn.NickServ);
                 Map(mn => mn.Enabled);
-                HasMany(mn => mn.Channels).Inverse();
+                HasMany(mn => mn.Channels).Inverse().Not.LazyLoad();
             }
         }
     }
