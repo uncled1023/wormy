@@ -12,30 +12,27 @@ namespace wormy.Modules
 
         public ChannelModule(NetworkManager network) : base(network)
         {
-            RegisterAdminCommand("join",
-                (arguments, e) =>
+            RegisterAdminCommand("join", (arguments, e) =>
+            {
+                if (arguments.Length != 1) return;
+                using (var session = Program.Database.SessionFactory.OpenSession())
                 {
-                    if (arguments.Length != 1) return;
-                    using (var session = Program.Database.SessionFactory.OpenSession())
+                    var channel = session.Query<Channel>().SingleOrDefault(cw => cw.Name == arguments[0]);
+                    if (channel == null)
                     {
-                        WormyChannel channel = session.Query<WormyChannel>().SingleOrDefault(cw => cw.Name == arguments[0]);
-                        if (channel == null)
-                        {
-                            channel = new WormyChannel();
-                            channel.CommandPrefix = "."; // Default prefix (TODO: customizable?)
-                            channel.Key = null;
-                            channel.Name = arguments[0];
-                            channel.Network = network.Configuration.Name;
-                            session.Save(channel);
-                            network.Client.JoinChannel(channel.Name);
-                            Respond(e, "I have added {0} to my channel list.", channel.Name);
-                        }
-                        else
-                        {
-                            Respond(e, "I already know about {0}.", arguments[0]);
-                        }
+                        channel = new Channel();
+                        channel.Name = arguments[0];
+                        channel.Network = network.Network;
+                        session.Save(channel);
+                        network.Client.JoinChannel(channel.Name);
+                        Respond(e, "I have added {0} to my channel list.", channel.Name);
                     }
-                }, "join [channel]: Adds the specified channel to the bot's channel list.");
+                    else
+                    {
+                        Respond(e, "I already know about {0}.", arguments[0]);
+                    }
+                }
+            }, "join [channel]: Adds the specified channel to the bot's channel list.");
         }
     }
 }

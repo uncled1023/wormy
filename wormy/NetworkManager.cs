@@ -12,11 +12,27 @@ namespace wormy
     public class NetworkManager
     {
         public Configuration.NetworkConfiguration Configuration { get; set; }
+        public Network Network { get; set; }
         public IrcClient Client { get; set; }
         public List<Module> Modules { get; set; }
 
         public event EventHandler ModulesLoaded;
         public event EventHandler<PrivateMessageEventArgs> HandleMessageBeforeModules;
+
+        public NetworkManager(Network network)
+            : this(new Configuration.NetworkConfiguration
+            {
+                Name = network.Name,
+                Address = network.Address,
+                User = network.User,
+                Nick = network.Nick,
+                RealName = network.RealName,
+                Password = network.Password,
+                MessageNickServ = network.NickServ
+            })
+        {
+            Network = network;
+        }
 
         public NetworkManager(Configuration.NetworkConfiguration config)
         {
@@ -83,7 +99,7 @@ namespace wormy
         {
             using (var session = Program.Database.SessionFactory.OpenSession())
             {
-                var channels = session.Query<WormyChannel>().Where(cw => cw.Network == Configuration.Name).Select(cw => cw.Name);
+                var channels = session.Query<WormyChannel>().Where(cw => cw.Network.ToUpper() == Configuration.Name.ToUpper()).Select(cw => cw.Name);
                 channels.ToList().ForEach(Client.JoinChannel);
             }
         }

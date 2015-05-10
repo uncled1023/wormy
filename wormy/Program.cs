@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Threading;
 using RedditSharp;
 using System.Threading.Tasks;
+using NHibernate.Linq;
+using System.Linq;
 
 namespace wormy
 {
@@ -12,6 +14,7 @@ namespace wormy
     {
         public static WormyDatabase Database { get; set; }
         public static Configuration Configuration { get; set; }
+        public static List<NetworkManager> NetworkManagers { get; set; }
 
         public static void Main(string[] args)
         {
@@ -31,11 +34,21 @@ namespace wormy
             Console.WriteLine("Connecting to database...");
             Database = new WormyDatabase(Configuration.Database.ConnectionString);
             Console.WriteLine("Connecting to IRC networks...");
-            List<NetworkManager> networkManagers = new List<NetworkManager>();
+            NetworkManagers = new List<NetworkManager>();
             foreach (var n in Configuration.Networks)
             {
                 var network = new NetworkManager(n);
-                networkManagers.Add(network);
+                NetworkManagers.Add(network);
+            }
+            using (var db = Database.SessionFactory.OpenSession())
+            {
+                foreach (var n in db.Query<Network>().Where(n => n.Enabled))
+                {
+                    if (Configuration.Networks.Any(_ => _.Name == n.Name))
+                        continue;
+                    var network = new NetworkManager(n);
+                    NetworkManagers.Add(network);
+                }
             }
             Thread.Yield();
             while (true)

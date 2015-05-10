@@ -16,9 +16,9 @@
     <DefineConstants>DEBUG;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Externalconsole>true</Externalconsole>
     <PlatformTarget>x86</PlatformTarget>
     <Commandlineparameters>debug.json</Commandlineparameters>
+    <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>full</DebugType>
@@ -75,7 +75,6 @@
     <Compile Include="Modules\ChannelModule.cs" />
     <Compile Include="Module.cs" />
     <Compile Include="Modules\PongModule.cs" />
-    <Compile Include="Modules\ModulesModule.cs" />
     <Compile Include="Modules\LinksModule.cs" />
     <Compile Include="Modules\HelpModule.cs" />
     <Compile Include="DependsAttribute.cs" />
@@ -97,7 +96,10 @@
     <Compile Include="Modules\KnightOSModule.cs" />
     <Compile Include="Modules\ShellModule.cs" />
     <Compile Include="Modules\OsuModule.cs" />
-    <Compile Include="Database\OsuAlias.cs" />
+    <Compile Include="Database\New\Identity.cs" />
+    <Compile Include="Database\New\Channel.cs" />
+    <Compile Include="Database\New\Network.cs" />
+    <Compile Include="Modules\AdminModule.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -106,6 +108,7 @@
   <ItemGroup>
     <Folder Include="Database\" />
     <Folder Include="Modules\" />
+    <Folder Include="Database\New\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\externals\ChatSharp\ChatSharp\ChatSharp.csproj">
