@@ -20,9 +20,7 @@ namespace wormy.Modules
                     var channel = session.Query<Channel>().SingleOrDefault(cw => cw.Name == arguments[0]);
                     if (channel == null)
                     {
-                        channel = new Channel();
-                        channel.Name = arguments[0];
-                        channel.Network = network.Network;
+                        channel = new Channel(arguments[0], network.Network);
                         session.Save(channel);
                         if (network.Client.Channels.All(c => c.Name != channel.Name))
                             network.Client.JoinChannel(channel.Name);

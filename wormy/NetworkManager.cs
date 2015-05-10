@@ -84,7 +84,7 @@ namespace wormy
             using (var session = Program.Database.SessionFactory.OpenSession())
             {
                 var network = session.Query<Network>().Single(n => n.ID == Network.ID);
-                network.Channels.Select(c => c.Name).ToList().ForEach(Client.JoinChannel);
+                network.Channels.Where(c => c.Enabled).Select(c => c.Name).ToList().ForEach(Client.JoinChannel);
             }
         }
 
