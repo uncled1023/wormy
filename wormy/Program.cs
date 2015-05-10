@@ -35,17 +35,10 @@ namespace wormy
             Database = new WormyDatabase(Configuration.Database.ConnectionString);
             Console.WriteLine("Connecting to IRC networks...");
             NetworkManagers = new List<NetworkManager>();
-            foreach (var n in Configuration.Networks)
-            {
-                var network = new NetworkManager(n);
-                NetworkManagers.Add(network);
-            }
             using (var db = Database.SessionFactory.OpenSession())
             {
                 foreach (var n in db.Query<Network>().Where(n => n.Enabled))
                 {
-                    if (Configuration.Networks.Any(_ => _.Name == n.Name))
-                        continue;
                     var network = new NetworkManager(n);
                     NetworkManagers.Add(network);
                 }

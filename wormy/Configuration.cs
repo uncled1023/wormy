@@ -22,8 +22,6 @@ namespace wormy
             File.WriteAllText(path, JsonConvert.SerializeObject(this, Formatting.Indented));
         }
 
-        [JsonProperty("networks")]
-        public NetworkConfiguration[] Networks { get; set; }
         [JsonProperty("database")]
         public DatabaseConfiguration Database { get; set; }
         [JsonProperty("reddit")]
@@ -39,24 +37,6 @@ namespace wormy
         {
             [JsonProperty("connectionString")]
             public string ConnectionString { get; set; }
-        }
-
-        public class NetworkConfiguration
-        {
-            [JsonProperty("name")]
-            public string Name { get; set; }
-            [JsonProperty("address")]
-            public string Address { get; set; }
-            [JsonProperty("user")]
-            public string User { get; set; }
-            [JsonProperty("nick")]
-            public string Nick { get; set; }
-            [JsonProperty("password")]
-            public string Password { get; set; }
-            [JsonProperty("realname")]
-            public string RealName { get; set; }
-            [JsonProperty("messageNickServ")]
-            public bool MessageNickServ { get; set; }
         }
 
         public class RedditConfiguration

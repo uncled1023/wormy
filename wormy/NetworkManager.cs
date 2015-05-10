@@ -11,7 +11,6 @@ namespace wormy
 {
     public class NetworkManager
     {
-        public Configuration.NetworkConfiguration Configuration { get; set; }
         public Network Network { get; set; }
         public IrcClient Client { get; set; }
         public List<Module> Modules { get; set; }
@@ -20,25 +19,10 @@ namespace wormy
         public event EventHandler<PrivateMessageEventArgs> HandleMessageBeforeModules;
 
         public NetworkManager(Network network)
-            : this(new Configuration.NetworkConfiguration
-            {
-                Name = network.Name,
-                Address = network.Address,
-                User = network.User,
-                Nick = network.Nick,
-                RealName = network.RealName,
-                Password = network.Password,
-                MessageNickServ = network.NickServ
-            })
         {
             Network = network;
-        }
-
-        public NetworkManager(Configuration.NetworkConfiguration config)
-        {
-            Configuration = config;
             Modules = new List<Module>();
-            Client = new IrcClient(config.Address, new IrcUser(config.Nick, config.User, config.Password, config.RealName));
+            Client = new IrcClient(network.Address, new IrcUser(network.Nick, network.User, network.Password, network.RealName));
             Client.RawMessageRecieved += (sender, e) => Console.WriteLine("<< {0}", e.Message);
             Client.RawMessageSent += (sender, e) => Console.WriteLine(">> {0}", e.Message);
             Client.ConnectionComplete += HandleConnectionComplete;
@@ -73,16 +57,16 @@ namespace wormy
 
         void HandleConnectionComplete(object sender, EventArgs e)
         {
-            Console.WriteLine("Connected to {0}.", Configuration.Name);
+            Console.WriteLine("Connected to {0}.", Network.Name);
             RegisterModules();
             Client.ChannelMessageRecieved += HandleMessageRecieved;
             Client.UserMessageRecieved += HandleMessageRecieved;
-            if (!Configuration.MessageNickServ)
+            if (!Network.NickServ)
                 JoinChannels();
             else
             {
                 Client.NoticeRecieved += HandleNickServ;
-                Client.SendMessage("identify " + Configuration.Password, "NickServ");
+                Client.SendMessage("identify " + Network.Password, "NickServ");
             }
         }
 
@@ -99,7 +83,7 @@ namespace wormy
         {
             using (var session = Program.Database.SessionFactory.OpenSession())
             {
-                var channels = session.Query<WormyChannel>().Where(cw => cw.Network.ToUpper() == Configuration.Name.ToUpper()).Select(cw => cw.Name);
+                var channels = session.Query<WormyChannel>().Where(cw => cw.Network.ToUpper() == Network.Name.ToUpper()).Select(cw => cw.Name);
                 channels.ToList().ForEach(Client.JoinChannel);
             }
         }

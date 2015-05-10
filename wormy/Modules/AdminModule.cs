@@ -74,7 +74,7 @@ namespace wormy.Modules
                         }
                         net.Enabled = false;
                         db.SaveOrUpdate(net);
-                        var manager = Program.NetworkManagers.SingleOrDefault(m => m.Configuration.Name.ToUpper() == net.Name.ToUpper());
+                        var manager = Program.NetworkManagers.SingleOrDefault(m => m.Network.Name.ToUpper() == net.Name.ToUpper());
                         if (manager != null)
                         {
                             manager.Client.Quit("Network has been disabled by " + e.PrivateMessage.User.Nick);
