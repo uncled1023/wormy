@@ -24,7 +24,8 @@ namespace wormy.Modules
                         channel.Name = arguments[0];
                         channel.Network = network.Network;
                         session.Save(channel);
-                        network.Client.JoinChannel(channel.Name);
+                        if (network.Client.Channels.All(c => c.Name != channel.Name))
+                            network.Client.JoinChannel(channel.Name);
                         Respond(e, "I have added {0} to my channel list.", channel.Name);
                     }
                     else
