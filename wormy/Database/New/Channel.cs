@@ -12,6 +12,8 @@ namespace wormy.Database
         public virtual string CommandPrefix { get; set; }
         public virtual Network Network { get; set; }
 
+        protected Channel() { }
+
         public Channel(string name, Network network)
         {
             CommandPrefix = ".";
