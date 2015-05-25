@@ -7,7 +7,7 @@ namespace wormy.Database
     {
         public virtual int Id { get; protected set; }
         public virtual string Mask { get; set; }
-        public virtual WormyChannel Channel { get; set; }
+        public virtual Channel Channel { get; set; }
 
         public class Mapping : ClassMap<IgnoredMask>
         {
@@ -15,7 +15,7 @@ namespace wormy.Database
             {
                 Id(mn => mn.Id);
                 Map(mn => mn.Mask);
-                References<WormyChannel>(mn => mn.Channel);
+                References<Channel>(mn => mn.Channel);
             }
         }
     }
