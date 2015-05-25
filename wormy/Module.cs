@@ -107,7 +107,7 @@ namespace wormy
             {
                 using (var session = Program.Database.SessionFactory.OpenSession())
                 {
-                    var channel = session.Query<WormyChannel>().SingleOrDefault(cw => cw.Name == e.PrivateMessage.Source);
+                    var channel = session.Query<Channel>().SingleOrDefault(cw => cw.Name == e.PrivateMessage.Source);
                     if (channel != null)
                     {
                         prefix = channel.CommandPrefix;
