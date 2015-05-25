@@ -50,8 +50,8 @@ namespace wormy.Modules
                         Respond(e, "I don't know about that channel.");
                     else
                     {
-                        if (channel.Enabled)
-                            Respond(e, "This channel is already enabled {0}.", arguments[0]);
+                        if (!channel.Enabled)
+                            Respond(e, "This channel is already enabled: {0}.", arguments[0]);
                         else
                         {
                             channel.Enabled = false;
