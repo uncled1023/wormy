@@ -9,7 +9,11 @@ namespace wormy.Modules
 
         public BotsModule(NetworkManager network) : base(network)
         {
-            RegisterUserCommand("bots", (s, e) => Respond(e, "Reporting in! [C#]"));
+            network.Client.ChannelMessageRecieved += (sender, e) => 
+            {
+                if (e.PrivateMessage.Message == ".bots")
+                    Respond(e, "Reporting in! [C#] https://github.com/SirCmpwn/wormy");
+            };
         }
     }
 }
