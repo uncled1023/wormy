@@ -30,6 +30,7 @@ namespace wormy.Modules
                         var regex = new Regex(parts[1]);
                         if (LastSaid.ContainsKey(e.PrivateMessage.User.Nick))
                         {
+                            return;
                             if (regex.IsMatch(LastSaid[e.PrivateMessage.User.Nick]))
                                 Respond(e, "<{0}> {1}", e.PrivateMessage.User.Nick, regex.Replace(LastSaid[e.PrivateMessage.User.Nick], parts[2]));
                         }
