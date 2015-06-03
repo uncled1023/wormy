@@ -24,6 +24,8 @@ namespace wormy.Modules
         {
             HostHandlers = new Dictionary<string, HostHandler>();
 
+            return;
+
             MatchRegex(UrlRegex, (e, matches) => Task.Factory.StartNew(() =>
                 {
                     foreach (Match match in matches)
