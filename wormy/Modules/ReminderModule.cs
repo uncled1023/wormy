@@ -51,7 +51,7 @@ namespace wormy.Modules
                     foreach (var reminder in expired)
                     {
                         Reminders.Remove(reminder);
-                        NetworkManager.Client.SendMessage(string.Format("{0}: Reminder to {1}", reminder.Target, reminder.Action), reminder.Source);
+                        NetworkManager.Client.SendMessage(string.Format("Reminder to {0}", reminder.Action), reminder.Target);
                         session.Delete(reminder);
                         session.Flush();
                     }
